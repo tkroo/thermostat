@@ -2,6 +2,7 @@ import network
 import ntptime
 from HeaterControl import HeaterControl
 
+
 def set_ntptime():
     """Set NTP time"""
     try:

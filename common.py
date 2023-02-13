@@ -10,7 +10,6 @@ PINS = {
     "spi_miso": Pin(10),
     "spi_sck": Pin(8),
     "spi_cs": Pin(20),
-
     "scl": Pin(7),
     "sda": Pin(6),
     "relay": Pin(2, Pin.OUT, value=0),

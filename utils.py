@@ -17,6 +17,7 @@ from common import PINS
 sta_if = network.WLAN(network.STA_IF)
 nw_addr = sta_if.ifconfig()[0]
 
+
 class MyFloat:
     """
     Class to represent a float value
@@ -141,6 +142,7 @@ def adjusted_time():
     else:  # we are after first sunday of november
         pst = time.localtime(now - (3600 * 8))  # PST:  UTC-8H
     return pst
+
 
 def formatted_time(st):
     """format time object to string"""

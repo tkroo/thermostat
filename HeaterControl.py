@@ -23,6 +23,7 @@ display = display.Oled_Display(i2c)
 th_sensor = shtc3.SHTC3_I2C(i2c)
 th_sensor.shtc3_init()
 
+
 class HeaterControl:
     """Class representing heater controller"""
 

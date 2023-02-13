@@ -6,7 +6,9 @@ from common import PINS
 
 
 def sdcard_init():
-    spisd = SoftSPI(1, miso=PINS["spi_miso"], mosi=PINS["spi_mosi"], sck=PINS["spi_sck"])
+    spisd = SoftSPI(
+        1, miso=PINS["spi_miso"], mosi=PINS["spi_mosi"], sck=PINS["spi_sck"]
+    )
     sd = SDCard(spisd, cs=PINS["spi_cs"])
     vfs = os.VfsFat(sd)
     os.mount(vfs, "/sd")

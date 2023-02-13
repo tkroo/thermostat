@@ -4,7 +4,9 @@ from lib.debounce import DebouncedSwitch
 from common import PINS, SETTINGS_FILE
 from utils import AppVars, save_current_schedule
 import micropython
+
 micropython.alloc_emergency_exception_buf(100)
+
 
 def init_controls():
     """Initialize controls"""

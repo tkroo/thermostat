@@ -7,13 +7,7 @@ import time
 from lib.microdot_asyncio import Microdot, send_file, redirect
 import machine
 from common import SETTINGS_FILE
-from utils import (
-    AppVars,
-    load_json,
-    save_schedule,
-    adjusted_time,
-    formatted_time
-)
+from utils import AppVars, load_json, save_schedule, adjusted_time, formatted_time
 
 
 app = Microdot()
