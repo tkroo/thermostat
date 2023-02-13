@@ -3,11 +3,12 @@ Heater control class. Should just be functions in main.py and not a class?
 """
 import time
 import uasyncio as asyncio
-from machine import SoftI2C, Pin
+from machine import SoftI2C
 
 from common import PINS, SETTINGS_FILE
 import display
 import lib.shtc3 as shtc3
+from lib.abutton import Pushbutton
 import controls
 
 from utils import (
@@ -56,6 +57,7 @@ class HeaterControl:
                     AppVars.curr_temp.value, AppVars.target_temp.value
                 )
                 display.display_text(readings)
+
 
     @staticmethod
     def update_heater_state(curr_temp, target_temp):
@@ -112,15 +114,28 @@ class HeaterControl:
         display.display_image("imgs/e.pbm", False)
         time.sleep(0.1)
 
+    @staticmethod
+    def init_controls():
+        """initialize physical buttons"""
+        but1 = Pushbutton(PINS["temp_up"])
+        but2 = Pushbutton(PINS["temp_down"])
+        but3 = Pushbutton(PINS["toggle"])
+        but1.long_func(controls.temp_up, (4,))
+        but1.press_func(controls.temp_up, (1,))
+        but2.long_func(controls.temp_down, (4,))
+        but2.press_func(controls.temp_down, (1,))
+        but3.press_func(controls.toggle_use_schedule, (0,))
+
+
     async def main(self):
         """Start async tasks"""
+        HeaterControl.init_controls()
         task = asyncio.create_task(self.update_loop2())
         webserver.webserver_start()
         await task
 
     def start(self):
         """Start heater controller"""
-        controls.init_controls()
         HeaterControl.load_settings()
         try:
             asyncio.run(self.main())
