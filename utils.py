@@ -105,6 +105,7 @@ def save_current_schedule(file_name):
     """save heating_schdule.json with updated use_heatschedule"""
     data = load_json(file_name)
     data["use_heatschedule"] = AppVars.use_heatschedule.value
+    data["saved_manual_temp"] = AppVars.manual_temp.value
     save_schedule(file_name, data)
 
 
