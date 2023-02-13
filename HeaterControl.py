@@ -62,11 +62,11 @@ class HeaterControl:
     @staticmethod
     def update_heater_state(curr_temp, target_temp):
         """Update heater state"""
-        h = AppVars.hysteresis.value
+        hyst = AppVars.hysteresis.value
 
-        if curr_temp >= target_temp + h:
+        if curr_temp >= target_temp + hyst:
             state = 0
-        elif curr_temp <= target_temp - h:
+        elif curr_temp <= target_temp - hyst:
             state = 1
         else:
             state = AppVars.heater_state.value
