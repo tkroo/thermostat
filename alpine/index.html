@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel='icon' href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎚️</text></svg>'>
+  <script defer src="bundle.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <title>THERMOSTAT ALPINE</title>
+  <script>
+    const baseURL = "http://"+location.host;
+    const scheduleURL = baseURL+"/schedule.json";
+    const sensorURL = baseURL+"/sensor.json";
+    const setTempURL = baseURL+"/set_temp";
+    const updateScheduleURL = baseURL+"/schedule_update";
+    function getSchedule() {
+      return {
+        unsaved_changes: false,
+        isLoading: false,
+        min_temp: 0,
+        max_temp: 90,
+        local_target_temp: this.min_temp,
+        local_use_heatschedule: null,
+        schedule: null,
+        sensorData: null,
+        mytime: null,
+        displayTime: null,
+        currentDay: null,
+        show_seconds: false,
+        prevupdatetime: 0,
+        view_all_days: false,
+        allorcurrent: "current",
+        show_debug: false,
+        fetchData() {
+          this.isLoading = true;
+          fetch(scheduleURL)
+          .then(res => res.json())
+          .then(data => {
+            this.isLoading = false;
+            this.schedule = data;
+            this.local_target_temp = this.schedule.saved_manual_temp;
+            this.local_use_heatschedule = this.schedule.use_heatschedule;
+            this.min_temp = this.schedule.minimum_temp;
+          }).catch(err => {
+            console.log(`fetchData() ERROR ${err}`);
+          })
+        },
+        fetchSensorData() {
+          this.isLoading = true;
+          fetch(sensorURL)
+          .then(res => res.json())
+          .then(data => {
+            this.isLoading = false;
+            this.sensorData = data;
+            if (this.prevupdatetime != this.sensorData.update_trigger) {
+              console.log(`update trigger changed ${this.sensorData.update_trigger}`);
+              this.prevupdatetime = this.sensorData.update_trigger;
+              this.local_use_heatschedule = this.sensorData.use_schedule;
+              if (!this.local_use_heatschedule && this.local_target_temp != this.sensorData.target_temp) {
+                console.log("FALSE this.local_use_heatschedule", this.local_use_heatschedule);
+                this.local_target_temp = this.sensorData.target_temp;
+              }
+              
+            }
+          }).catch(err => {
+            console.log(`fetchSensorData() ERROR ${err}`);
+          })
+        },
+        updateLoop() {
+          const interval = setInterval(() => {
+            this.fetchSensorData();
+          }, 5000);
+        },
+        updateTime() {
+          const tinterval = setInterval(() => {
+            this.mytime = new Date();
+            this.displayTime = this.show_seconds ? dayjs(this.mytime).format('h:mm:ss a') : dayjs(this.mytime).format('h:mm a');
+            this.currentDay = dayjs(this.mytime).format('dddd');
+          }, 1000)
+        },
+        async set_target_temperature() {
+          fetch(setTempURL ,{
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: parseFloat(this.local_target_temp)
+          })
+          this.update_schedule_file()
+        },
+        async update_schedule_file() {
+          this.schedule.use_heatschedule = this.local_use_heatschedule;
+          this.schedule.saved_manual_temp = parseFloat(this.local_target_temp);
+          this.schedule.minimum_temp = parseFloat(this.schedule.minimum_temp);
+          this.schedule.hysteresis = parseFloat(this.schedule.hysteresis);
+          this.schedule = this.schedule;
+          console.log("updating schedule file");
+          const res = await fetch(updateScheduleURL, {
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(this.schedule)
+          });
+          this.unsaved_changes = false;
+        },
+        // reset_machine() {
+        //   fetch(baseURL+"/reset")
+        // },
+        addPeriod(day) {
+          const newPeriod = {"start": "1:00 pm", "end": "1:00 pm", "temp": this.schedule.minimum_temp}
+          console.log(day)
+          day.periods.push(newPeriod);
+          this.schedule = this.schedule;
+          this.unsaved_changes = true;
+        },
+        removePeriod(day, period) {
+          let idx = day.periods.indexOf(period);
+          day.periods.splice(idx, 1);
+          this.schedule = this.schedule;
+          this.unsaved_changes = true;
+        },
+        moveup(day, period) {
+          let idx = day.periods.indexOf(period);
+          if (idx !== 0) {
+            day.periods.splice(idx-1, 0, day.periods.splice(idx,1)[0]);
+            this.schedule = this.schedule;
+          }
+        },
+        movedown(day, period) {
+          let idx = day.periods.indexOf(period);
+          if (idx < day.periods.length - 1) {
+            day.periods.splice(idx+1, 0, day.periods.splice(idx,1)[0]);
+            this.schedule = this.schedule;
+          }
+        },
+        checkIsBetween(period, day) {
+          let compareDay = dayjs(this.mytime).format('YYYY/MM/DD')
+          let s = dayjs(compareDay+' '+period.start).unix();
+          let e = dayjs(compareDay+' '+period.end).unix();
+          let rightnow  = dayjs(this.mytime).unix();
+          return (rightnow >= s && rightnow <= e) && this.currentDay == day ? true : false;
+        },
+        getDays() {
+          if (this.view_all_days) {
+            return this.schedule.days;
+          } else {
+            return this.schedule.days.filter(day => day.name == this.currentDay);
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body>
+  <main x-data="getSchedule()" x-init="fetchData(); updateTime(); fetchSensorData(); updateLoop();">
+    <div class="flexheader">
+      <h1 class="title">Thermostat</h1>
+      <h2 class="displaytime" x-show="mytime" x-on:click="show_seconds = !show_seconds" x-text="`${currentDay} ${displayTime}`">Saturday 00:00:00</h2>
+    </div>
+
+    <template x-if="sensorData && schedule">
+      <div class="controls">
+        <div class="flexheader">
+          <h2>Current Temp: <span x-text=`${sensorData.temp.toFixed(1)}&deg;F`></span><br>
+          Target Temp: <strong x-text=`${sensorData.target_temp.toFixed(1)}&deg;F`></strong><br>
+          Heater is <strong x-text="sensorData.heater_state ? 'ON 🔥' : 'OFF 💤'"></strong>
+        </h2>
+        <h2>Humidity: <strong x-text="`${sensorData.humidity.toFixed(0)}%`"></strong></h2>
+      </div>
+
+
+      <div class="range-wrapper" :class="local_use_heatschedule ? 'disabled' : ''">
+        <label class="label_box" for="target_temp">Set target temp: <span class="numinput">
+          <input x-on:change.lazy="set_target_temperature" type="number" x-model="local_target_temp" /> &deg;F</span>
+        </label>
+        <span class="flexheader">
+          <span><span x-text="local_target_temp"></span>&nbsp;&deg;F&nbsp;</span>
+          <input x-on:change.lazy="set_target_temperature" class="range" :disabled="local_use_heatschedule" id="target_temp" name="target_temp" type="range" :min="min_temp" :max="max_temp" step="1" x-model="local_target_temp" />
+        </span>
+      </div>
+      
+      <!-- <div class="range-wrapper" :class="local_use_heatschedule ? 'disabled' : ''">
+        <span class="flexheader">
+          <span><span x-text="local_target_temp"></span>&nbsp;&deg;F&nbsp;</span>
+          <span class="dual-sliders">
+            <input class="range current" type="range" :min="min_temp" :max="max_temp" :value="sensorData.temp.toFixed(1)" />
+            <input class="range target" x-on:change.lazy="set_target_temperature" :disabled="local_use_heatschedule" id="target_temp" name="target_temp" type="range" :min="min_temp" :max="max_temp" step="1" x-model="local_target_temp" />
+          </span>
+        </span>
+      </div> -->
+
+
+      <details>
+        <summary>more</summary>
+        <div class="details_body">
+          <label for="hysteresis">Hysteresis: <input class="num_input" x-on:change="unsaved_changes = true" name="hysteresis" type="number" step="0.1" x-model="schedule.hysteresis"></label><br>
+          <label for="minimum_temp">Minimum Temp: <input class="num_input" x-on:change="unsaved_changes = true" name="minimum_temp" type="number" step="1" x-model="schedule.minimum_temp"></label><br>
+          <a class="link" :href="scheduleURL">/schedule.json</a><br>
+          <a class="link" :href="sensorURL">/sensor.json</a>
+          <label for="debug">debug info:<input name="debug" id="debug" type="checkbox" x-model="show_debug"></label>
+          <!-- <button style="width:fit-content" x-on:click="reset_machine">reset machine</button> -->
+        </div>
+      </details>
+      </div>
+    </template>
+    
+    <div>
+      <template x-if="schedule">
+        <div>
+          <div class="flexheader">
+            <h2 x-init="$watch('allorcurrent', value => view_all_days = (value == 'all') ? true : false)"><span class="title">Schedule</span> <span x-text="local_use_heatschedule ? 'ON' : 'OFF'"></span>
+              <details class="schedule_detail">
+                <summary>more</summary>
+                <div class="details_body">
+                  <label class="small" for="use_sched">schedule enabled&nbsp;<input type="checkbox" name="use_sched" id="use_sched" x-on:change="set_target_temperature" x-model="local_use_heatschedule"></label><br>
+                  <!-- <label class="small" for="toggledays">show all week&nbsp;<input type="checkbox" name="toggledays" id="toggledays" x-model="view_all_days"></label><br> -->
+                  <label class="small">current day: <input type="radio" value="current" x-model="allorcurrent"></label>
+                  <label class="small">all days: <input type="radio" value="all" x-model="allorcurrent"></label>
+                </div>
+              </details>
+            </h2>
+            <div>
+              <span x-show="unsaved_changes" class="small warning">There are unsaved changes </span>
+              <button x-on:click="update_schedule_file" type="submit">save changes</button>
+            </div>
+          </div>
+          <div :class="!local_use_heatschedule ? 'disabled grid-container' : 'grid-container'">
+          <template x-for="day in getDays()">
+            
+              <div class="dayofweek">
+                <h2 :class='day.name == currentDay ? "day active" : "day"''><span x-text="day.name"></span> <button class="btn add" x-on:click="addPeriod(day)" title="add">+</button></h2>
+                
+                <template x-for="period in day.periods">
+                  <div :class='checkIsBetween(period, day.name) ? "period active" : "period"'>
+                  <!-- <div class="period"> -->
+                    <div class="inputs">
+                      <div class="start">
+                        <span>start:&nbsp;</span><input type="text" x-on:change="unsaved_changes = true" x-model="period.start">
+                      </div>
+                      <div class="end">
+                        <span>end:&nbsp;</span><input type="text" x-on:change="unsaved_changes = true" x-model="period.end">
+                      </div>
+                      <div class="temp">
+                        <span>temp: <span x-text="period.temp"></span></span>&nbsp;<input class="range" id="period_temp" name="period_temp" type="range" :min="min_temp" :max="max_temp" step="1" x-on:change="unsaved_changes = true" x-model="period.temp">
+                      </div>
+                    </div>
+                    <div class="specials">
+                      <button class="btn up" x-on:click="moveup(day,period)">^</button>
+                      <button class="btn down" x-on:click="movedown(day,period)">^</button>
+                      <div class="remove">
+                        <button class="btn" x-on:click="removePeriod(day,period)" title="delete">x</button>
+                      </div>
+                    </div>
+                  </div>
+
+                </template>
+              </div>
+              
+            </template>
+          </div>
+        </div>
+      </template>
+    </div>
+    <template x-if="sensorData && schedule && show_debug">
+      <div class="debug">
+        <p>local_use_heatschedule: <span x-text="local_use_heatschedule"></span></p>
+        <p>schedule.use_heatschedule: <span x-text="schedule.use_heatschedule"></span></p>
+        <p>sensorData.use_schedule: <span x-text="sensorData.use_schedule"></span></p>
+        <p>local_target_temp: <span x-text="local_target_temp"></span></p>
+        <p>sensorData.target_temp: <span x-text="sensorData.target_temp"></span></p>
+        <p>schedule.saved_manual_temp: <span x-text="schedule.saved_manual_temp"></span></p>
+      </div>
+    </template>
+    <template x-if="schedule && show_debug">
+      <div>
+        <p x-text="`${JSON.stringify(schedule)}`"></p>
+      </div>
+    </template>
+  </main>
+</body>
+</html>

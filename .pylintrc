@@ -1,0 +1,2 @@
+[MESSAGES CONTROL]
+disable=no-else-return,invalid-name,missing-function-docstring,missing-module-docstring,import-error

@@ -1,0 +1,7 @@
+aside
+.env
+.env.*
+!.env.example
+secret.py
+__pycache__
+*.code-workspace
