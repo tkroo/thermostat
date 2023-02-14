@@ -1,11 +1,14 @@
-"""Function to connect to network"""
+"""
+Function to connect to network
+# file secret.py contains:
+WIFI_SSID="yourwifinetworkname"
+WIFI_PASSWORD="yourwifinetworkpassword"
+or you can just set the variables WIFI_SSID and WIFI_PASSWORD in this file
+"""
 from time import sleep
 import network
 from secret import WIFI_SSID, WIFI_PASSWORD
 
-# file secret.py should look like:
-# WIFI_SSID="yourwifinetworkname"
-# WIFI_PASSWORD="yourwifinetworkpassword"
 
 
 def connect():
