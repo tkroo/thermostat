@@ -1,5 +1,8 @@
-# pylint: disable=missing-function-docstring
-"""interface for SHTC3 temperature sensor I2C module"""
+# pylint: disable=missing-function-docstring,no-member
+"""
+interface for SHTC3 temperature sensor I2C module
+adapted from https://github.com/RAKWireless/Micropython-LoRaWAN-on-RAK4600/blob/master/shtc3.py
+"""
 
 import time
 
@@ -21,15 +24,13 @@ class SHTC3_I2C:
         num = int.from_bytes(buf, "big")
         print("I2C device shtc3 init and id is %d" % num)
 
-    def get_temperature_humidity(self, echo=False, ret=True):
+    def get_temperature_humidity(self):
         buf = bytearray([0x7C, 0xA2])
         self.i2c.writeto(0x70, buf)
         buf2 = bytearray([0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
         self.i2c.readfrom_into(0x70, buf2)
         temp = (buf2[1] | (buf2[0] << 8)) * 175 / 65536.0 - 45.0
         humi = (buf2[4] | (buf2[3] << 8)) * 100 / 65536.0
-        # echo_Arg = "shtc3: Temperature=" + str(temp) + ", Humidity=" + str(humi)
-        # print(echo_Arg)
         ret_Arg = {}
         ret_Arg["humidity"] = humi
         ret_Arg["temp"] = temp
