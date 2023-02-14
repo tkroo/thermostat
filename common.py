@@ -36,3 +36,4 @@ PINS = {
 # }
 
 SETTINGS_FILE = "sd/heating_schedule.json"
+WEBSERVER_PORT = 80

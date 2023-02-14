@@ -2,6 +2,7 @@
 """Display sensor data on OLED or print to console"""
 from machine import SoftI2C
 import network
+from common import WEBSERVER_PORT
 from utils import AppVars
 import lib.ssd1306 as ssd1306
 import framebuf
@@ -34,7 +35,7 @@ class Oled_Display:
         self.oled.text(f"TARGET: {AppVars.target_temp.value:.1f}", 0, 20)
         self.oled.text(f"{us}", 0, 30)
         self.oled.text(f"{nw_addr}", 0, 47)
-        self.oled.text("PORT 5000", 0, 56)
+        self.oled.text(f"PORT {WEBSERVER_PORT}", 0, 56)
         self.oled.show()
 
     def display_lines(self, lines):
