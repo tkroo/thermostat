@@ -1,7 +1,20 @@
 """Physical controls"""
 import time
-from common import SETTINGS_FILE
+from common import PINS, SETTINGS_FILE
 from utils import AppVars, save_current_schedule
+from lib.abutton import Pushbutton
+
+
+def init_controls():
+    """initialize physical buttons"""
+    but1 = Pushbutton(PINS["temp_up"])
+    but2 = Pushbutton(PINS["temp_down"])
+    but3 = Pushbutton(PINS["toggle"])
+    but1.long_func(temp_up, (4,))
+    but1.press_func(temp_up, (1,))
+    but2.long_func(temp_down, (4,))
+    but2.press_func(temp_down, (1,))
+    but3.press_func(toggle_use_schedule, (0,))
 
 
 def temp_up(amount):
