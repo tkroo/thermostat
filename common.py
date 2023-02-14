@@ -6,6 +6,7 @@ from machine import Pin
 # GPIO 9 is a strapping pin on esp32c3 and sdcard doesn't release mosi pin on reset?
 # using SoftSPI instead of SPI, and swapping the pin assignments seems to avoid the problem. :)
 
+# Pin mappings for Seed Studios XIAO ESP32c3
 PINS = {
     "spi_mosi": Pin(9),
     "spi_miso": Pin(10),
@@ -18,5 +19,20 @@ PINS = {
     "temp_down": Pin(4, Pin.IN, Pin.PULL_UP),
     "temp_up": Pin(3, Pin.IN, Pin.PULL_UP),
 }
+
+# Pin mappings for ESP32 DevKit v1 board
+# PINS = {
+#     # "dht_sensor": Pin(16),
+#     "spi_miso": Pin(13),
+#     "spi_mosi": Pin(12),
+#     "spi_sck": Pin(14),
+#     "spi_cs": Pin(27),
+#     "scl": Pin(22),
+#     "sda": Pin(21),
+#     "relay": Pin(25, Pin.OUT, value=0),
+#     "toggle": Pin(17, Pin.IN, Pin.PULL_UP),
+#     "temp_down": Pin(15, Pin.IN, Pin.PULL_UP),
+#     "temp_up": Pin(4, Pin.IN, Pin.PULL_UP),
+# }
 
 SETTINGS_FILE = "sd/heating_schedule.json"
