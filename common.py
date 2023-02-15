@@ -18,11 +18,12 @@ PINS = {
     "toggle": Pin(5, Pin.IN, Pin.PULL_UP),
     "temp_down": Pin(4, Pin.IN, Pin.PULL_UP),
     "temp_up": Pin(3, Pin.IN, Pin.PULL_UP),
+    "dht11": Pin(21),
 }
 
 # Pin mappings for ESP32 DevKit v1 board
 # PINS = {
-#     # "dht_sensor": Pin(16),
+#     # "dht": Pin(16),
 #     "spi_miso": Pin(13),
 #     "spi_mosi": Pin(12),
 #     "spi_sck": Pin(14),
@@ -37,3 +38,5 @@ PINS = {
 
 SETTINGS_FILE = "sd/heating_schedule.json"
 WEBSERVER_PORT = 80
+SENSOR_TYPE = "shtc3"
+# SENSOR_TYPE = "dhtXX"

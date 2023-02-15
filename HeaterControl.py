@@ -5,10 +5,10 @@ import time
 import uasyncio as asyncio
 from machine import SoftI2C
 
-from common import PINS, SETTINGS_FILE
+from common import PINS, SETTINGS_FILE, SENSOR_TYPE
 from utils import (
     AppVars,
-    read_shtc3_sensor,
+    read_th_sensor,
     load_json,
 )
 import display
@@ -20,8 +20,13 @@ import webserver
 
 i2c = SoftI2C(scl=PINS["scl"], sda=PINS["sda"])
 display = display.Oled_Display(i2c)
-th_sensor = shtc3.SHTC3_I2C(i2c)
-th_sensor.shtc3_init()
+
+if SENSOR_TYPE == "shtc3":
+    th_sensor = shtc3.SHTC3_I2C(i2c)
+    th_sensor.shtc3_init()
+elif SENSOR_TYPE == "dhtXX":
+    import dht
+    th_sensor = dht.DHT11(PINS['dht11'])
 
 
 class HeaterControl:
@@ -37,7 +42,7 @@ class HeaterControl:
         while True:
             await asyncio.sleep(self.delay)
             changed = False
-            readings = read_shtc3_sensor(th_sensor)
+            readings = read_th_sensor(th_sensor)
             AppVars.curr_hum.set(readings["humidity"])
 
             if abs(readings["temp"] - self.prev_temp_reading) > 0.5:
@@ -100,7 +105,7 @@ class HeaterControl:
         AppVars.minimum_temp.set(data["minimum_temp"])
         AppVars.manual_temp.set(data["saved_manual_temp"])
 
-        initial_readings = read_shtc3_sensor(th_sensor)
+        initial_readings = read_th_sensor(th_sensor)
         AppVars.curr_temp.set(initial_readings["temp"])
         AppVars.curr_hum.set(initial_readings["humidity"])
 

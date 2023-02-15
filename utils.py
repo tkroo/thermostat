@@ -6,7 +6,7 @@ import json
 import time
 import network
 import machine
-from common import PINS
+from common import PINS, SENSOR_TYPE
 
 # from umqtt.simple import MQTTClient
 
@@ -74,8 +74,23 @@ def read_shtc3_sensor(sensor):
         return {"temp": c2f(readings["temp"]), "humidity": readings["humidity"]}
     except Exception as e:
         print(f"Error reading sensor: {e}")
-        # blink_led(5, 0.08)
         return {"temp": 99, "humidity": 0}
+
+def read_dhtXX_sensor(sensor):
+    try:
+        sensor.measure()
+        return {"temp": c2f(sensor.temperature()), "humidity": sensor.humidity()}
+    except Exception as e:
+        print(f"Error reading sensor: {e}")
+        return {"temp": 99, "humidity": 0}
+
+
+def read_th_sensor(sensor):
+    """read the shtc3 sensor"""
+    if SENSOR_TYPE == "shtc3":
+        return read_shtc3_sensor(sensor)
+    else:
+        return read_dhtXX_sensor(sensor)
 
 
 def load_json(file_name):
