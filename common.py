@@ -29,10 +29,10 @@ PINS = {
 #     "spi_cs": Pin(27),
 #     "scl": Pin(22),
 #     "sda": Pin(21),
-#     "relay": Pin(25, Pin.OUT, value=0),
-#     "toggle": Pin(17, Pin.IN, Pin.PULL_UP),
-#     "temp_down": Pin(15, Pin.IN, Pin.PULL_UP),
-#     "temp_up": Pin(4, Pin.IN, Pin.PULL_UP),
+#     "relay": Pin(32, Pin.OUT, value=0),
+#     "toggle": Pin(26, Pin.IN, Pin.PULL_UP),
+#     "temp_down": Pin(25, Pin.IN, Pin.PULL_UP),
+#     "temp_up": Pin(33, Pin.IN, Pin.PULL_UP),
 # }
 
 SETTINGS_FILE = "sd/heating_schedule.json"
