@@ -132,9 +132,11 @@
           }
         },
         checkIsBetween(period, day) {
+          let ps = period.start.replace(/(\d)([aApP])/g, "$1 $2")
+          let pe = period.end.replace(/(\d)([aApP])/g, "$1 $2")
           let compareDay = dayjs(this.mytime).format('YYYY/MM/DD')
-          let s = dayjs(compareDay+' '+period.start).unix();
-          let e = dayjs(compareDay+' '+period.end).unix();
+          let s = dayjs(compareDay+' '+ps).unix();
+          let e = dayjs(compareDay+' '+pe).unix();
           let rightnow  = dayjs(this.mytime).unix();
           return (rightnow >= s && rightnow <= e) && this.currentDay == day ? true : false;
         },
@@ -214,6 +216,7 @@
                   <!-- <label class="small" for="toggledays">show all week&nbsp;<input type="checkbox" name="toggledays" id="toggledays" x-model="view_all_days"></label><br> -->
                   <label class="small">current day: <input type="radio" value="current" x-model="allorcurrent"></label>
                   <label class="small">all days: <input type="radio" value="all" x-model="allorcurrent"></label>
+                  <p>OK: 1:00pm 1:00 pm 13:00 13, NOT OK: 1pm, 1 pm</p>
                 </div>
               </details>
             </h2>
