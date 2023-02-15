@@ -11,8 +11,8 @@ def convert_to_24(time_str):
     """convert 12 hour time to 24 hour time"""
     time_str = time_str.strip().lower()
     hm = time_str.split(":")
-    hrs = int(hm[0])
-    mins = int(re.sub(" *[am|pm]", "", hm[1])) if len(hm) == 2 else 0
+    hrs = int(re.sub("\D", "", hm[0]))
+    mins = int(re.sub("\D", "", hm[1])) if len(hm) == 2 else 0
 
     if "am" in time_str:
         if hrs == 12:
