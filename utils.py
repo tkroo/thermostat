@@ -26,17 +26,11 @@ class MyFloat:
 
     def __init__(self, value=0.0):
         self.value = value
-        self.previous_value = self.value
 
-    def set(self, value, on_change_callback=None):
+    def set(self, value):
         """Function to set float value"""
         self.value = float(value)
-        if self.previous_value != self.value:
-            # print(f"Float value changed from {self.previous_value} to {self.value}")
-            self.previous_value = self.value
-            if on_change_callback:
-                on_change_callback()
-        time.sleep(0.1)
+        time.sleep_ms(1)
 
 
 class MyBool:
@@ -48,7 +42,7 @@ class MyBool:
     def set(self, value):
         """Function to set the value of the boolean."""
         self.value = value
-        time.sleep(0.1)
+        time.sleep_ms(1)
 
 
 class AppVars:
