@@ -106,7 +106,6 @@ async def update_loop2():
         if changed:
             changed = False
             update_heater_state(AppVars.curr_temp.value, AppVars.target_temp.value)
-            webserver.wssensor(readings)
             oled.display_text(readings)
 
 
