@@ -13,7 +13,6 @@ from utils import (
 )
 import oled
 import lib.shtc3 as shtc3
-import lib.ssd1306 as ssd1306
 import controls
 
 from check_schedule import check_schedule

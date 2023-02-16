@@ -6,7 +6,7 @@ import json
 import time
 import network
 import machine
-from common import PINS, SENSOR_TYPE
+from common import SENSOR_TYPE
 
 # from umqtt.simple import MQTTClient
 
