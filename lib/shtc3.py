@@ -12,6 +12,7 @@ class SHTC3_I2C:
 
     def __init__(self, i2c_obj):
         self.i2c = i2c_obj
+        self.shtc3_init()
 
     # shtc3 init addr-0x70
     def shtc3_init(self):
