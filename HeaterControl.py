@@ -11,19 +11,19 @@ from utils import (
     read_th_sensor,
     load_json,
 )
-import display
+import oled
 import lib.shtc3 as shtc3
+import lib.ssd1306 as ssd1306
 import controls
 
 from check_schedule import check_schedule
 import webserver
 
 i2c = SoftI2C(scl=PINS["scl"], sda=PINS["sda"])
-display = display.Oled_Display(i2c)
+oled = oled.Oled_Display(i2c)
 
 if SENSOR_TYPE == "shtc3":
     th_sensor = shtc3.SHTC3_I2C(i2c)
-    th_sensor.shtc3_init()
 elif SENSOR_TYPE == "dhtXX":
     import dht
     th_sensor = dht.DHT11(PINS['dht11'])
@@ -60,7 +60,7 @@ class HeaterControl:
                 HeaterControl.update_heater_state(
                     AppVars.curr_temp.value, AppVars.target_temp.value
                 )
-                display.display_text(readings)
+                oled.display_text(readings)
 
     @staticmethod
     def update_heater_state(curr_temp, target_temp):
@@ -114,7 +114,7 @@ class HeaterControl:
         print(f"initial temp: {AppVars.curr_temp.value}")
         print(f"initial humidity: {AppVars.curr_hum.value}")
         print(f"initial target temp: {AppVars.target_temp.value}")
-        display.display_image("imgs/e.pbm", False)
+        oled.display_image("imgs/e.pbm", False)
         time.sleep(0.1)
 
     async def main(self):
@@ -134,4 +134,4 @@ class HeaterControl:
         finally:
             print("FINALLY")
             PINS["relay"].value(0)
-            display.oled.poweroff()
+            oled.oled.poweroff()
