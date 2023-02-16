@@ -5,7 +5,6 @@ Microdot webserver for thermostat interface webpage
 import json
 import time
 from lib.microdot_asyncio import Microdot, send_file, redirect
-import machine
 from common import SETTINGS_FILE, WEBSERVER_PORT
 from utils import AppVars, load_json, save_schedule, adjusted_time, formatted_time
 
@@ -82,13 +81,6 @@ async def schedule_update(request):
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
     }
-
-
-@app.route("/reset")
-def reset_route(request):
-    """reset machine"""
-    print("resetting machine")
-    machine.reset()
 
 
 @app.route("/alpine")
