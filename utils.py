@@ -6,6 +6,7 @@ import json
 import time
 import network
 import machine
+import ntptime
 from common import SENSOR_TYPE
 
 # from umqtt.simple import MQTTClient
@@ -157,6 +158,16 @@ def adjusted_time():
 def formatted_time(st):
     """format time object to string"""
     return f"{st[0]}-{st[1]:02d}-{st[2]:02d} {st[3]:2}:{st[4]:02d}:{st[5]:02d}"
+
+
+def set_ntptime():
+    """Set NTP time"""
+    try:
+        ntptime.settime()
+    except Exception as e:
+        # """ERROR - ntptime.settime() error: [Errno 116] ETIMEDOUT"""
+        print(f"ERROR - ntptime.settime() error: {e}")
+        set_ntptime()
 
 
 def print_pins():
