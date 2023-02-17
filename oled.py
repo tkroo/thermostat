@@ -1,6 +1,5 @@
 # pylint: disable=import-outside-toplevel, global-statement
 """Display sensor data on OLED or print to console"""
-from machine import SoftI2C
 import network
 from common import WEBSERVER_PORT
 from utils import AppVars
