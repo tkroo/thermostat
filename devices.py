@@ -1,17 +1,46 @@
-# pylint: disable=import-outside-toplevel, global-statement
-"""Display sensor data on OLED or print to console"""
-import network
-from common import WEBSERVER_PORT
+# pylint: disable=no-member,import-outside-toplevel
+"""initialize sd card module"""
+import os
+from machine import SoftSPI, SoftI2C
+from common import PINS, WEBSERVER_PORT, SENSOR_TYPE
 from utils import AppVars
+import lib.shtc3 as shtc3
 import lib.ssd1306 as ssd1306
 import framebuf
+from lib.sdcard import SDCard
 
 
-sta_if = network.WLAN(network.STA_IF)
-nw_addr = sta_if.ifconfig()[0]
+class i2cDevices:
+    """init i2c devices"""
 
-# oled = None
-# I2C_ADDR = "0x3c"  # ? trying to detect if OLED is connected
+    def __init__(self, scl=PINS["scl"], sda=PINS["sda"]):
+        self.scl = scl
+        self.sda = sda
+        self.i2c = SoftI2C(scl=PINS["scl"], sda=PINS["sda"])
+        self.oled = self.init_oled()
+        self.th_sensor = self.init_th_sensor()
+
+    def init_th_sensor(self):
+        if SENSOR_TYPE == "shtc3":
+            th_sensor = shtc3.SHTC3_I2C(self.i2c)
+        elif SENSOR_TYPE == "dhtXX":
+            import dht
+
+            th_sensor = dht.DHT11(PINS["dht11"])
+        return th_sensor
+
+    def init_oled(self):
+        return Oled_Display(self.i2c)
+
+
+def sdcard_init():
+    spisd = SoftSPI(
+        1, miso=PINS["spi_miso"], mosi=PINS["spi_mosi"], sck=PINS["spi_sck"]
+    )
+    sd = SDCard(spisd, cs=PINS["spi_cs"])
+    vfs = os.VfsFat(sd)
+    os.mount(vfs, "/sd")
+    print(f'/sd: {os.listdir("/sd")}')
 
 
 class Oled_Display:
@@ -20,7 +49,7 @@ class Oled_Display:
     def __init__(self, i2c):
         self.oled = ssd1306.SSD1306_I2C(128, 64, i2c)
 
-    def display_text(self, message):
+    def display_text(self, message, nw_addr):
         """display sensor data"""
         # self.oled.poweron()
         t = message["temp"]

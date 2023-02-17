@@ -1,31 +1,19 @@
 import time
 import network
 import uasyncio as asyncio
-from machine import SoftI2C
 
-from common import PINS, SETTINGS_FILE, SENSOR_TYPE
+from common import PINS, SETTINGS_FILE
 import utils
 from utils import AppVars
 
-import oled
-import lib.shtc3 as shtc3
+import devices
 import controls
 
 from check_schedule import check_schedule
 import webserver
 
 DELAY = 5
-
-
-i2c = SoftI2C(scl=PINS["scl"], sda=PINS["sda"])
-oled = oled.Oled_Display(i2c)
-
-if SENSOR_TYPE == "shtc3":
-    th_sensor = shtc3.SHTC3_I2C(i2c)
-elif SENSOR_TYPE == "dhtXX":
-    import dht
-    th_sensor = dht.DHT11(PINS["dht11"])
-
+devices = devices.i2cDevices()
 
 
 def set_target_temperature():
@@ -49,7 +37,7 @@ def load_settings():
     AppVars.minimum_temp.set(data["minimum_temp"])
     AppVars.manual_temp.set(data["saved_manual_temp"])
 
-    initial_readings = utils.read_th_sensor(th_sensor)
+    initial_readings = utils.read_th_sensor(devices.th_sensor)
     AppVars.curr_temp.set(initial_readings["temp"])
     AppVars.curr_hum.set(initial_readings["humidity"])
 
@@ -58,7 +46,7 @@ def load_settings():
     print(f"initial temp: {AppVars.curr_temp.value}")
     print(f"initial humidity: {AppVars.curr_hum.value}")
     print(f"initial target temp: {AppVars.target_temp.value}")
-    oled.display_image("imgs/e.pbm", False)
+    devices.oled.display_image("imgs/e.pbm", False)
     time.sleep(0.1)
 
 
@@ -90,7 +78,7 @@ async def update_loop2():
     while True:
         await asyncio.sleep(DELAY)
         changed = False
-        readings = utils.read_th_sensor(th_sensor)
+        readings = utils.read_th_sensor(devices.th_sensor)
         AppVars.curr_hum.set(readings["humidity"])
 
         if abs(readings["temp"] - prev_temp_reading) > 0.5:
@@ -106,7 +94,7 @@ async def update_loop2():
         if changed:
             changed = False
             update_heater_state(AppVars.curr_temp.value, AppVars.target_temp.value)
-            oled.display_text(readings)
+            devices.oled.display_text(readings, nw_addr=sta_if.ifconfig()[0])
 
 
 async def main():
@@ -127,7 +115,7 @@ def start():
     finally:
         print("FINALLY")
         PINS["relay"].value(0)
-        oled.oled.poweroff()
+        devices.oled.oled.poweroff()
 
 
 sta_if = network.WLAN(network.STA_IF)
