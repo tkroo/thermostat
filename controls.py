@@ -1,7 +1,7 @@
 """Physical controls"""
 import time
 from common import PINS, SETTINGS_FILE
-from utils import AppVars, save_current_schedule
+from utils import AppVars, load_json, save_schedule
 from lib.abutton import Pushbutton
 
 
@@ -41,3 +41,11 @@ def toggle_use_schedule(_pin):
     print(f"use_heatschedule toggled from {AppVars.use_heatschedule.value} to {tog}")
     AppVars.use_heatschedule.set(tog)
     save_current_schedule(SETTINGS_FILE)
+
+
+def save_current_schedule(file_name):
+    """save heating_schdule.json with updated use_heatschedule"""
+    data = load_json(file_name)
+    data["use_heatschedule"] = AppVars.use_heatschedule.value
+    data["saved_manual_temp"] = AppVars.manual_temp.value
+    save_schedule(file_name, data)

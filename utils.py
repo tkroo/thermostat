@@ -111,22 +111,9 @@ def f2c(f):
     return (f - 32) / 1.80
 
 
-def save_current_schedule(file_name):
-    """save heating_schdule.json with updated use_heatschedule"""
-    data = load_json(file_name)
-    data["use_heatschedule"] = AppVars.use_heatschedule.value
-    data["saved_manual_temp"] = AppVars.manual_temp.value
-    save_schedule(file_name, data)
-
-
 def save_schedule(file_name, data):
     """write to heating_schedule.json"""
     save_json(file_name, data)
-    update_from_schedule(data)
-
-
-def update_from_schedule(data):
-    """load heating_schedule.json"""
     AppVars.use_heatschedule.value = data["use_heatschedule"]
     AppVars.hysteresis.set(data["hysteresis"])
     AppVars.use_oled.set(data["use_oled"])
