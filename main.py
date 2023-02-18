@@ -2,9 +2,9 @@ import time
 import network
 import uasyncio as asyncio
 
-from common import PINS, SETTINGS_FILE
+from common import PINS, SETTINGS_FILE, WEBSERVER_PORT
 import utils
-from utils import AppVars
+from utils import AppVars, nw_addr
 
 import devices
 import controls
@@ -94,7 +94,30 @@ async def update_loop2():
         if changed:
             changed = False
             update_heater_state(AppVars.curr_temp.value, AppVars.target_temp.value)
-            devices.oled.display_text(readings, nw_addr=sta_if.ifconfig()[0])
+            # devices.oled.display_text(readings, nw_addr=sta_if.ifconfig()[0])
+            update_display()
+
+# self.oled.text(f"T:{t:.1f}F   H:{h:.1f}%", 0, 0)
+# self.oled.text(f"HEAT: {hs}", 0, 9)
+# self.oled.text(f"TARGET: {AppVars.target_temp.value:.1f}", 0, 20)
+# self.oled.text(f"{us}", 0, 30)
+# self.oled.text(f"{nw_addr}", 0, 47)
+# self.oled.text(f"PORT {WEBSERVER_PORT}", 0, 56)
+
+def update_display():
+    """max 16 characters wide"""
+    lines = [
+        f"T:{AppVars.curr_temp.value:.1f}F   H:{AppVars.curr_hum.value:.1f}%",
+        "HEAT: ON" if AppVars.heater_state.value else "HEAT: OFF",
+        f"TARGET: {AppVars.target_temp.value:.1f}",
+        "USING SCHEDULE" if AppVars.use_heatschedule.value else "MANUAL CONTROL",
+        "",
+        "",
+        f"{nw_addr}",
+        # f"PORT {WEBSERVER_PORT}",
+    ]
+    devices.oled.display_lines(lines)
+
 
 
 async def main():
