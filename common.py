@@ -36,7 +36,7 @@ PINS = {
 #     "temp_up": Pin(33, Pin.IN, Pin.PULL_UP),
 # }
 
-SETTINGS_FILE = "sd/heating_schedule.json"
+SETTINGS_FILE = "sd/data/schedule.json"
 WEBSERVER_PORT = 80
 SENSOR_TYPE = "shtc3"
 # SENSOR_TYPE = "dhtXX"

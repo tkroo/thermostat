@@ -15,7 +15,7 @@ app = Microdot()
 @app.route("/")
 async def index_route(request):
     """redirect index route"""
-    return redirect("/alpine/index.html")
+    return redirect("/t/index.html")
 
 
 @app.route("/schedule.json")
@@ -83,16 +83,17 @@ async def schedule_update(request):
     }
 
 
-@app.route("/alpine")
+@app.route("/t")
 def alpine_index(request):
     """redirect alpine index route"""
     return redirect("/alpine/index.html")
 
 
-@app.route("/alpine/<path:path>")
+@app.route("/t/<path:path>")
 def thermostat(request, path):
     """Serve svelte frontend"""
-    return send_file("/alpine/" + path)
+    time.sleep_ms(100)
+    return send_file("/sd/web/" + path)
 
 
 def webserver_start():
