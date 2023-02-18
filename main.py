@@ -112,9 +112,8 @@ def update_display():
         f"TARGET: {AppVars.target_temp.value:.1f}",
         "USING SCHEDULE" if AppVars.use_heatschedule.value else "MANUAL CONTROL",
         "",
-        "",
         f"{nw_addr}",
-        # f"PORT {WEBSERVER_PORT}",
+        f"PORT {WEBSERVER_PORT}",
     ]
     devices.oled.display_lines(lines)
 
