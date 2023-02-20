@@ -122,9 +122,11 @@ def update_display():
 async def main():
     """Start async tasks"""
     controls.init_controls()
-    task = asyncio.create_task(update_loop2())
+    event_loop = asyncio.get_event_loop()
+
+    event_loop.create_task(update_loop2())
     webserver.webserver_start()
-    await task
+    event_loop.run_forever()
 
 
 def start():
