@@ -71,7 +71,7 @@ def update_heater_state(curr_temp, target_temp):
     print(f"heater_state:{AppVars.heater_state.value} ***")
 
 
-async def update_loop2():
+async def update_loop():
     """update heater state if change is detected"""
     prev_temp_reading = 0
     prev_target = 0
@@ -124,7 +124,7 @@ async def main():
     controls.init_controls()
     event_loop = asyncio.get_event_loop()
 
-    event_loop.create_task(update_loop2())
+    event_loop.create_task(update_loop())
     webserver.webserver_start()
     event_loop.run_forever()
 
