@@ -21,11 +21,10 @@ PINS = {
     "dht11": Pin(21),
 }
 
-# Pin mappings for ESP32 DevKit v1 board
+# # Pin mappings for ESP32 DevKit v1 board
 # PINS = {
-#     # "dht": Pin(16),
-#     "spi_miso": Pin(13),
 #     "spi_mosi": Pin(12),
+#     "spi_miso": Pin(13),
 #     "spi_sck": Pin(14),
 #     "spi_cs": Pin(27),
 #     "scl": Pin(22),
@@ -34,6 +33,7 @@ PINS = {
 #     "toggle": Pin(26, Pin.IN, Pin.PULL_UP),
 #     "temp_down": Pin(25, Pin.IN, Pin.PULL_UP),
 #     "temp_up": Pin(33, Pin.IN, Pin.PULL_UP),
+#     "dht": Pin(16),
 # }
 
 SETTINGS_FILE = "sd/data/schedule.json"
