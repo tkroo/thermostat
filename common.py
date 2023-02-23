@@ -36,7 +36,9 @@ PINS = {
 #     "dht": Pin(16),
 # }
 
+MQTT_BROKER_ADDRESS = "192.168.1.35"
 SETTINGS_FILE = "sd/data/schedule.json"
+LOG_FILE = "sd/data/log.csv"
 WEBSERVER_PORT = 80
 SENSOR_TYPE = "shtc3"
 # SENSOR_TYPE = "dhtXX"

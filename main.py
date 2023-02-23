@@ -2,12 +2,13 @@ import time
 import network
 import uasyncio as asyncio
 
-from common import PINS, SETTINGS_FILE, WEBSERVER_PORT
+from common import PINS, SETTINGS_FILE, WEBSERVER_PORT, MQTT_BROKER_ADDRESS, LOG_FILE
 import utils
-from utils import AppVars, nw_addr
+from utils import AppVars
 
 import devices
 import controls
+from umqtt.simple import MQTTClient
 
 from check_schedule import check_schedule
 import webserver
@@ -95,7 +96,10 @@ async def update_loop():
             changed = False
             update_heater_state(AppVars.curr_temp.value, AppVars.target_temp.value)
             # devices.oled.display_text(readings, nw_addr=sta_if.ifconfig()[0])
+            mqtt_publish()
             update_display()
+            await log_append(LOG_FILE, f"{utils.formatted_time(utils.adjusted_time())}, {readings['temp']}, {readings['humidity']}")
+
 
 # self.oled.text(f"T:{t:.1f}F   H:{h:.1f}%", 0, 0)
 # self.oled.text(f"HEAT: {hs}", 0, 9)
@@ -103,6 +107,19 @@ async def update_loop():
 # self.oled.text(f"{us}", 0, 30)
 # self.oled.text(f"{nw_addr}", 0, 47)
 # self.oled.text(f"PORT {WEBSERVER_PORT}", 0, 56)
+
+
+def mqtt_publish():
+    mqtt_client.publish(
+        "esp32c3_thermostat/temperature", msg=b"%f" % AppVars.curr_temp.value
+    )
+    mqtt_client.publish(
+        "esp32c3_thermostat/humidity", msg=b"%f" % AppVars.curr_hum.value
+    )
+    mqtt_client.publish(
+        "esp32c3_thermostat/target_temp", msg=b"%f" % AppVars.target_temp.value
+    )
+
 
 def update_display():
     """max 16 characters wide"""
@@ -112,11 +129,17 @@ def update_display():
         f"TARGET: {AppVars.target_temp.value:.1f}",
         "USING SCHEDULE" if AppVars.use_heatschedule.value else "MANUAL CONTROL",
         "",
-        f"{nw_addr}",
+        f"{utils.nw_addr}",
         f"PORT {WEBSERVER_PORT}",
     ]
     devices.oled.display_lines(lines)
 
+
+async def log_append(file, msg):
+    with open(file, "a") as f:
+        f.write(f"{msg}\n")
+    print(f"log_append({msg})")
+    await asyncio.sleep(0.1)
 
 
 async def main():
@@ -142,9 +165,11 @@ def start():
         devices.oled.oled.poweroff()
 
 
+mqtt_client = MQTTClient("thermosvelteESP32", MQTT_BROKER_ADDRESS)
 sta_if = network.WLAN(network.STA_IF)
 if sta_if.isconnected():
     utils.set_ntptime()
+    mqtt_client.connect()
     start()
 else:
     print("NO NETWORK CONNECTION. WILL NOT RUN")
