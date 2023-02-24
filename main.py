@@ -2,7 +2,7 @@ import time
 import network
 import uasyncio as asyncio
 
-from common import PINS, SETTINGS_FILE, WEBSERVER_PORT, MQTT_BROKER_ADDRESS, LOG_FILE
+from common import PINS, SETTINGS_FILE, WEBSERVER_PORT, MQTT_BROKER_ADDRESS, LOG_FILE, EPOCH_ADJUSTMENT
 import utils
 from utils import AppVars
 
@@ -98,7 +98,7 @@ async def update_loop():
             # devices.oled.display_text(readings, nw_addr=sta_if.ifconfig()[0])
             mqtt_publish()
             update_display()
-            await log_append(LOG_FILE, f"{utils.formatted_time(utils.adjusted_time())}, {readings['temp']}, {readings['humidity']}")
+            await log_append(LOG_FILE, f"{time.time()+EPOCH_ADJUSTMENT},{readings['temp']:.1f},{readings['humidity']:.1f}")
 
 
 # self.oled.text(f"T:{t:.1f}F   H:{h:.1f}%", 0, 0)

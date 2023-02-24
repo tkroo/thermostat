@@ -5,7 +5,7 @@ Microdot webserver for thermostat interface webpage
 import json
 import time
 from lib.microdot_asyncio import Microdot, send_file, redirect
-from common import SETTINGS_FILE, WEBSERVER_PORT
+from common import SETTINGS_FILE, WEBSERVER_PORT, LOG_FILE
 from utils import AppVars, load_json, save_schedule, adjusted_time, formatted_time
 
 
@@ -46,6 +46,22 @@ async def readsensor(request):
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
     }
+
+
+# @app.route("/log.csv")
+# async def log(request):
+#     """Serve log.csv"""
+#     res = ""
+#     with open(LOG_FILE, "r") as f:
+#         res = f.read()
+#     return {res, }
+
+@app.route("/log.csv")
+async def log(request):
+    return send_file(LOG_FILE, {
+        "Content-Type": "text/csv",
+        "Access-Control-Allow-Origin": "*",
+    })
 
 
 @app.route("/set_temp", methods=["POST"])

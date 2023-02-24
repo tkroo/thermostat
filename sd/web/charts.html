@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel='icon' href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎚️</text></svg>'>
+  
+
+  <link rel="stylesheet" href="style.css">
+  <title>THERMOSTAT ALPINE</title>
+</head>
+<body>
+  <main x-data="getSchedule()" x-init="fetchData(); updateTime(); fetchSensorData(); updateLoop();">
+    <h1 class="title">History</h1>
+    <div>
+      <canvas id="myChart"></canvas>
+    </div>
+  </main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js" integrity="sha512-SGWgwwRA8xZgEoKiex3UubkSkV1zSE1BS6O4pXcaxcNtUlQsOmOmhVnDwIvqGRfEmuz83tIGL13cXMZn6upPyg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.2.1/chart.umd.min.js" integrity="sha512-GCiwmzA0bNGVsp1otzTJ4LWQT2jjGJENLGyLlerlzckNI30moi2EQT0AfRI7fLYYYDKR+7hnuh35r3y1uJzugw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+
+    const ctx = document.getElementById('myChart');
+    const options = {
+      type: 'line',
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+        },
+        title: {
+          display: true,
+          text: 'Sensor Readings'
+        }
+      },
+      data: {
+        labels: ['2023-02-23 5:04 PM'],
+        datasets: [
+        {
+          label: 'temperature',
+          data: [70],
+        },
+        {
+          label: 'humidity',
+          data: [50],
+        }
+        ]
+      }
+    };
+    const myChart = new Chart(ctx, options);
+
+    function getData() {
+      Papa.parse('/log.csv', {
+        header: true,
+        download: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          // return results;
+          update_chart(results)
+        }
+      })
+    }
+
+    
+
+    const CHART_COLORS = {
+      red: 'rgb(255, 99, 132)',
+      orange: 'rgb(255, 159, 64)',
+      yellow: 'rgb(255, 205, 86)',
+      green: 'rgb(75, 192, 192)',
+      blue: 'rgb(54, 162, 235)',
+      purple: 'rgb(153, 102, 255)',
+      grey: 'rgb(201, 203, 207)'
+    };
+
+
+    function update_chart(csvData) {
+      const new_data = {
+        labels: csvData.data.map(d => new Date(d.unix_time*1000).toLocaleString('en-US', {timeZone: 'America/Los_Angeles'})),
+        datasets: [
+          {
+            label: 'Temperature',
+            data: csvData.data.map(d => d.temperature),
+            borderColor: CHART_COLORS.red,
+            backgroundColor: CHART_COLORS.orange,
+            cubicInterpolationMode: 'monotone',
+          },
+          {
+            label: 'Humidity',
+            data: csvData.data.map(d => d.humidity),
+            borderColor: CHART_COLORS.blue,
+            backgroundColor: CHART_COLORS.green,
+            cubicInterpolationMode: 'monotone',
+          }
+        ]
+      };
+      myChart.data.labels = new_data.labels;
+      myChart.data.datasets = new_data.datasets;
+      myChart.update('none');
+    };
+
+    function updateLoop() {
+      const interval = setInterval(() => {
+        getData();
+      }, 5000);
+    }
+    
+    updateLoop()
+
+
+  </script>
+</body>
+</html>
