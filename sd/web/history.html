@@ -8,16 +8,18 @@
   
 
   <link rel="stylesheet" href="style.css">
-  <title>THERMOSTAT ALPINE</title>
+  <title>HISTORY</title>
 </head>
 <body>
   <main x-data="getSchedule()" x-init="fetchData(); updateTime(); fetchSensorData(); updateLoop();">
     <div class="flexheader">
-      <h1 class="title">History</h1>
-      <h2><a class="link" href="/log.csv">log.csv</a></h2>
+      <h1 class="title"><a class="link" href="index.html">Thermostat</a> | History</h1>
     </div>
     <div>
       <canvas id="myChart"></canvas>
+    </div>
+    <div>
+      <p><a class="link" href="/log.csv">download log.csv</a></p>
     </div>
   </main>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js" integrity="sha512-SGWgwwRA8xZgEoKiex3UubkSkV1zSE1BS6O4pXcaxcNtUlQsOmOmhVnDwIvqGRfEmuz83tIGL13cXMZn6upPyg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
