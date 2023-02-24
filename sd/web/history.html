@@ -4,16 +4,16 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel='icon' href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎚️</text></svg>'>
+  <link rel='icon' href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📈</text></svg>'>
   
 
   <link rel="stylesheet" href="style.css">
-  <title>HISTORY</title>
+  <title>LOG</title>
 </head>
 <body>
-  <main x-data="getSchedule()" x-init="fetchData(); updateTime(); fetchSensorData(); updateLoop();">
+  <main class="wide">
     <div class="flexheader">
-      <h1 class="title"><a class="link" href="index.html">Thermostat</a> | History</h1>
+      <h1 class="title"><a class="link" href="index.html">Thermostat</a> | Log</h1>
     </div>
     <div>
       <canvas id="myChart"></canvas>
@@ -26,10 +26,21 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.2.1/chart.umd.min.js" integrity="sha512-GCiwmzA0bNGVsp1otzTJ4LWQT2jjGJENLGyLlerlzckNI30moi2EQT0AfRI7fLYYYDKR+7hnuh35r3y1uJzugw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script>
 
+    const CHART_COLORS = {
+      red: 'rgb(255, 99, 132)',
+      orange: 'rgb(255, 159, 64)',
+      yellow: 'rgb(255, 205, 86)',
+      green: 'rgb(75, 192, 192)',
+      blue: 'rgb(54, 162, 235)',
+      purple: 'rgb(153, 102, 255)',
+      grey: 'rgb(201, 203, 207)'
+    };
+
     const ctx = document.getElementById('myChart');
     const options = {
       type: 'line',
       responsive: true,
+      animation: false,
       plugins: {
         legend: {
           position: 'bottom',
@@ -39,16 +50,32 @@
           text: 'Sensor Readings'
         }
       },
+      scales: {
+        y: {
+          suggestedMin: 50,
+          suggestedMax: 100
+        }
+      },
       data: {
         labels: ['2023-02-23 5:04 PM'],
         datasets: [
         {
-          label: 'temperature',
+          label: 'Temperature',
           data: [70],
+          borderColor: CHART_COLORS.red,
+          backgroundColor: CHART_COLORS.orange,
+          cubicInterpolationMode: 'monotone',
+          pointStyle: false,
+          borderWidth: 1,
         },
         {
-          label: 'humidity',
+          label: 'Humidity',
           data: [50],
+          borderColor: CHART_COLORS.blue,
+          backgroundColor: CHART_COLORS.green,
+          cubicInterpolationMode: 'monotone',
+          pointStyle: false,
+          borderWidth: 1,
         }
         ]
       }
@@ -61,7 +88,8 @@
         download: true,
         skipEmptyLines: true,
         complete: function(results) {
-          // return results;
+          console.log(results)
+          calculations(results)
           update_chart(results)
         }
       })
@@ -69,15 +97,7 @@
 
     
 
-    const CHART_COLORS = {
-      red: 'rgb(255, 99, 132)',
-      orange: 'rgb(255, 159, 64)',
-      yellow: 'rgb(255, 205, 86)',
-      green: 'rgb(75, 192, 192)',
-      blue: 'rgb(54, 162, 235)',
-      purple: 'rgb(153, 102, 255)',
-      grey: 'rgb(201, 203, 207)'
-    };
+    
 
 
     function update_chart(csvData) {
@@ -85,25 +105,30 @@
         labels: csvData.data.map(d => new Date(d.unix_time*1000).toLocaleString('en-US', {timeZone: 'America/Los_Angeles'})),
         datasets: [
           {
-            label: 'Temperature',
-            data: csvData.data.map(d => d.temperature),
-            borderColor: CHART_COLORS.red,
-            backgroundColor: CHART_COLORS.orange,
-            cubicInterpolationMode: 'monotone',
+            data: csvData.data.map(d => d.temperature)
           },
           {
-            label: 'Humidity',
-            data: csvData.data.map(d => d.humidity),
-            borderColor: CHART_COLORS.blue,
-            backgroundColor: CHART_COLORS.green,
-            cubicInterpolationMode: 'monotone',
+            data: csvData.data.map(d => d.humidity)
           }
         ]
       };
       myChart.data.labels = new_data.labels;
-      myChart.data.datasets = new_data.datasets;
+      myChart.data.datasets[0].data = new_data.datasets[0].data;
+      myChart.data.datasets[1].data = new_data.datasets[1].data;
+      // myChart.data.datasets.forEach(dataset => {
+      //   dataset.pointStyle = false;
+      // });
       myChart.update('none');
     };
+
+
+    function calculations(results) {
+      const max_temp = results.data.map(t => t.temperature).reduce((a,b) => Math.max(a,b));
+      const min_temp = results.data.map(t => t.temperature).reduce((a,b) => Math.min(a,b));
+      const max_entry = results.data.find(t => t.temperature == max_temp);
+      const min_entry = results.data.find(t => t.temperature == min_temp);
+      console.log("max_temp:", max_temp, "\nmin_temp:", min_temp, "\nmax_entry:", max_entry, "\nmin_entry:", min_entry)
+    }
 
     function updateLoop() {
       const interval = setInterval(() => {

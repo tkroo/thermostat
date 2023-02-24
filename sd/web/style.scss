@@ -50,7 +50,12 @@ body {
 main {
   margin: 0 auto;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  max-width: 1200px;
+  max-width: 1400px;
+}
+
+.wide {
+  max-width: unset;
+  padding: 0 2em 4em 2em;
 }
 
 .title {

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel='icon' href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎚️</text></svg>'>
+  <link rel='icon' href='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📈</text></svg>'>
   <script defer src="bundle.js"></script>
   <link rel="stylesheet" href="style.css">
   <title>THERMOSTAT</title>
@@ -154,7 +154,7 @@
 <body>
   <main x-data="getSchedule()" x-init="fetchData(); updateTime(); fetchSensorData(); updateLoop();">
     <div class="flexheader">
-      <h1 class="title">Thermostat | <a class="link" href="history.html">History</a></h1>
+      <h1 class="title">Thermostat | <a class="link" href="history.html">Log</a></h1>
       <h2 class="displaytime" x-show="mytime" x-on:click="show_seconds = !show_seconds" x-text="`${currentDay} ${displayTime}`">Saturday 00:00:00</h2>
     </div>
 
