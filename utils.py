@@ -149,6 +149,7 @@ def formatted_time(st):
 
 def set_ntptime():
     """Set NTP time"""
+    ntptime.timeout = 2
     try:
         ntptime.settime()
     except Exception as e:
