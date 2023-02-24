@@ -12,7 +12,10 @@
 </head>
 <body>
   <main x-data="getSchedule()" x-init="fetchData(); updateTime(); fetchSensorData(); updateLoop();">
-    <h1 class="title">History</h1>
+    <div class="flexheader">
+      <h1 class="title">History</h1>
+      <h2><a href="/log.csv">log.csv</a></h2>
+    </div>
     <div>
       <canvas id="myChart"></canvas>
     </div>
