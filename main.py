@@ -111,13 +111,13 @@ async def update_loop():
 
 def mqtt_publish():
     mqtt_client.publish(
-        "esp32c3_thermostat/temperature", msg=b"%f" % AppVars.curr_temp.value
+        "thermostat/temperature", msg=b"%f" % AppVars.curr_temp.value
     )
     mqtt_client.publish(
-        "esp32c3_thermostat/humidity", msg=b"%f" % AppVars.curr_hum.value
+        "thermostat/humidity", msg=b"%f" % AppVars.curr_hum.value
     )
     mqtt_client.publish(
-        "esp32c3_thermostat/target_temp", msg=b"%f" % AppVars.target_temp.value
+        "thermostat/target_temp", msg=b"%f" % AppVars.target_temp.value
     )
 
 
