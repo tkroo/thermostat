@@ -155,7 +155,7 @@
   <main x-data="getSchedule()" x-init="fetchData(); updateTime(); fetchSensorData(); updateLoop();">
     <div class="flexheader">
       <h1 class="title">Thermostat | <a class="link" href="history.html">Log</a></h1>
-      <h2 class="displaytime" x-show="mytime" x-on:click="show_seconds = !show_seconds" x-text="`${currentDay} ${displayTime}`">Saturday 00:00:00</h2>
+      <h2 class="displaytime" x-show="mytime" x-on:click="show_seconds = !show_seconds" x-text="`${currentDay} ${displayTime}`">_</h2>
     </div>
 
     <template x-if="sensorData && schedule">
