@@ -123,11 +123,13 @@ def mqtt_publish():
 
 def update_display():
     """max 16 characters wide"""
+    hs = " HEAT:ON" if AppVars.heater_state.value else "HEAT:OFF"
+    s_or_m = "SCHEDULE" if AppVars.use_heatschedule.value else "  MANUAL"
     lines = [
-        f"T:{AppVars.curr_temp.value:.1f}F   H:{AppVars.curr_hum.value:.1f}%",
-        "HEAT: ON" if AppVars.heater_state.value else "HEAT: OFF",
-        f"TARGET: {AppVars.target_temp.value:.1f}",
-        "USING SCHEDULE" if AppVars.use_heatschedule.value else "MANUAL CONTROL",
+        f"T:{AppVars.curr_temp.value:.1f}F {hs}",
+        f"H:{AppVars.curr_hum.value:.1f}% {utils.formatted_time(utils.adjusted_time())}",
+        f"SET:{AppVars.target_temp.value:.0f}  {s_or_m}",
+        "",
         "",
         f"{utils.nw_addr}",
         f"PORT {WEBSERVER_PORT}",

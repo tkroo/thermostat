@@ -128,7 +128,7 @@ DST_ends = time.mktime(
     (year, 11, (31 - (int(5 * year / 4 + 1)) % 7), 2, 0, 0, 0, 0, 0)
 )  # Time of November change to PST
 
-
+# (year, month, mday, hour, minute, second, weekday, yearday)
 def adjusted_time():
     """returns PST time with daylight savings adjustment"""
     # In PST timezone daylight savings starts Sunday March, 12 at 2:00AM and ends Sunday November 5 at 2:00AM
@@ -142,9 +142,25 @@ def adjusted_time():
     return pst
 
 
+
+def formatted_date(st):
+    return f"{st[0]}-{st[1]:02d}-{st[2]:02d} {st[3]:2}:{st[4]:02d}:{st[5]:02d}"
+
+
 def formatted_time(st):
     """format time object to string"""
-    return f"{st[0]}-{st[1]:02d}-{st[2]:02d} {st[3]:2}:{st[4]:02d}:{st[5]:02d}"
+    hour = st[3]
+    minutes = st[4]
+    ampm = "AM" if hour < 12 else "PM"
+    hour %= 12
+    return f"12:{minutes} {ampm}" if hour == 0 else f"{hour}:{minutes} {ampm}"
+    # return f"{st[0]}-{st[1]:02d}-{st[2]:02d} {st[3]:2}:{st[4]:02d}:{st[5]:02d}"
+
+
+# def convert12(hour, minutes):
+#     ampm = "AM" if hour < 12 else "PM"
+#     hour %= 12
+#     return f"12:{minutes} {ampm}" if hour == 0 else f"{hour}:{minutes} {ampm}"
 
 
 def set_ntptime():

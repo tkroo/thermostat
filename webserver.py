@@ -6,7 +6,7 @@ import json
 import time
 from lib.microdot_asyncio import Microdot, send_file, redirect
 from common import SETTINGS_FILE, WEBSERVER_PORT, LOG_FILE
-from utils import AppVars, load_json, save_schedule, adjusted_time, formatted_time
+from utils import AppVars, load_json, save_schedule, adjusted_time, formatted_date
 
 
 app = Microdot()
@@ -32,7 +32,7 @@ async def schedule_route(request):
 async def readsensor(request):
     """Serve sensor readings as json"""
     obj = {
-        "formatted_time": formatted_time(adjusted_time()),
+        "formatted_date": formatted_date(adjusted_time()),
         "time": time.time(),
         "temp": AppVars.curr_temp.value,
         "humidity": AppVars.curr_hum.value,
